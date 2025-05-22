@@ -1,10 +1,13 @@
 name: Android CI
 
 on:
-  pull_request:
   push:
     branches:
       - main
+    tags:
+      - '*'   # or your tag pattern
+  pull_request:
+  workflow_dispatch:
 
 jobs:
   build:

@@ -41,7 +41,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import cash.andrew.circlestacker.ui.theme.CircleStackerTheme
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -115,18 +117,17 @@ fun CoroutineScope.restartGame(
 }
 
 suspend fun loadHighScore(context: Context): Int {
-    return suspendCoroutine {
-        val highScore = try {
+    return try {
+        withContext(Dispatchers.IO) {
             context.openFileInput(HIGH_SCORE_FILE).use { f ->
                 f.bufferedReader()
                     .readText()
                     .toIntOrNull() ?: 0
             }
-        } catch (e: Exception) {
-            Log.e("loadHightScore", null, e)
-            0
         }
-        it.resume(highScore)
+    } catch (e: Exception) {
+        Log.e("loadHighScore", null, e)
+        0
     }
 }
 
@@ -167,7 +168,10 @@ fun Game(viewModel: MainViewModel) {
         is GameState.GameOver -> GameOver(
             highScore = highScore,
             gameState = state,
-            onClick = restartGame
+            onClick = {
+                highScore = it ?: highScore
+                restartGame()
+            }
         )
 
         is GameState.Playing -> {
@@ -250,9 +254,8 @@ fun GameRunning(
 fun GameOver(
     highScore: Int,
     gameState: GameState.GameOver,
-    onClick: () -> Unit
+    onClick: (newHighScore: Int?) -> Unit
 ) {
-
     var newHighScore by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
@@ -260,8 +263,10 @@ fun GameOver(
         newHighScore = gameState.points > highScore
         if (newHighScore) {
             try {
-                context.openFileOutput(HIGH_SCORE_FILE, Context.MODE_PRIVATE).use {
-                    it.write(gameState.points.toString().toByteArray())
+                withContext(Dispatchers.IO) {
+                    context.openFileOutput(HIGH_SCORE_FILE, Context.MODE_PRIVATE).use {
+                        it.write(gameState.points.toString().toByteArray())
+                    }
                 }
             } catch (e: Exception) {
                 Log.e("GameOver", "Error saving high score", e)
@@ -273,7 +278,7 @@ fun GameOver(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .clickable(onClick = onClick),
+            .clickable(onClick = { onClick(if (newHighScore) gameState.points else null) }),
         contentAlignment = Alignment.Center
     ) {
         OldCircles(listOfCircles = gameState.circles)

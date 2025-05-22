@@ -12,11 +12,13 @@ android {
     namespace = "cash.andrew.circlestacker"
     compileSdk = 35
 
+
+    val buildNumber: String by project
     defaultConfig {
         applicationId = "rocks.ghostreader.circlestacker"
         minSdk = 21
         targetSdk = 35
-        versionCode = 1
+        versionCode = buildNumber.toInt()
         versionName = "Alumni Blues"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

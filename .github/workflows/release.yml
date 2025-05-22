@@ -1,10 +1,9 @@
-name: Android CI
+name: Release Build
 
 on:
-  pull_request:
   push:
-    branches:
-      - main
+    tags:
+      - '*'  # Runs on any tag
 
 jobs:
   build:
@@ -37,14 +36,23 @@ jobs:
       - name: Build with Gradle (using gradle/actions)
         uses: gradle/actions/setup-gradle@v3
 
-      - name: Build signed AAB
+      - name: Build signed APKs/AABs
         run: gradle bundleRelease --no-daemon
 
-      - name: Upload to Google Play (Internal Test Track)
+      - name: Upload Release Assets
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            app/build/outputs/apk/release/*.apk
+            app/build/outputs/bundle/release/*.aab
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload to Google Play
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
           packageName: rocks.ghostreader.circlestacker
           releaseFiles: app/build/outputs/bundle/release/*.aab
-          track: internal
+          track: production
           status: completed

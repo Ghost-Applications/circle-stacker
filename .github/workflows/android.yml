@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - main
-    tags:
-      - '*'   # or your tag pattern
   pull_request:
   workflow_dispatch:
 
@@ -41,7 +39,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
 
       - name: Build signed AAB
-        run: gradle bundleRelease --no-daemon
+        run: ./gradlew build bundle --no-daemon
 
       - name: Upload to Google Play (Internal Test Track)
         uses: r0adkll/upload-google-play@v1

@@ -54,7 +54,7 @@ jobs:
       - name: Import GPG key
         run: |
           echo "${{ secrets.PGP_KEY }}" > private.key
-          gpg --batch --import private.key
+          gpg --batch --passphrase "${{ secrets.PGP_PASSWORD }}" --import private.key
 
       - name: Sign APKs with GPG
         run: |

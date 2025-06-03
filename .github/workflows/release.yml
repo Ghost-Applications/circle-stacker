@@ -53,17 +53,14 @@ jobs:
 
       - name: Import GPG key
         run: |
-          echo "${{ secrets.PGP_KEY }}" | gpg --batch --import
-        env:
-          PGP_KEY: ${{ secrets.PGP_KEY }}
+          echo "${{ secrets.PGP_KEY }}" > private.key
+          gpg --batch --import private.key
 
       - name: Sign APKs with GPG
         run: |
           for file in app/build/outputs/apk/release/*.apk; do
             gpg --batch --yes --pinentry-mode loopback --passphrase "${{ secrets.PGP_PASSWORD }}" --armor --detach-sign "$file"
           done
-        env:
-          PGP_PASSWORD: ${{ secrets.PGP_PASSWORD }}
 
       - name: Upload Release Assets
         uses: softprops/action-gh-release@v2

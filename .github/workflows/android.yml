@@ -43,9 +43,8 @@ jobs:
 
       - name: Import GPG key
         run: |
-          echo "${{ secrets.PGP_KEY }}" | gpg --batch --import
-        env:
-          PGP_KEY: ${{ secrets.PGP_KEY }}
+          echo "${{ secrets.PGP_KEY }}" > private.key
+          gpg --batch --import private.key
 
       - name: Sign APKs and AABs with GPG
         run: |
@@ -54,8 +53,6 @@ jobs:
               gpg --batch --yes --pinentry-mode loopback --passphrase "${{ secrets.PGP_PASSWORD }}" --armor --detach-sign "$file"
             fi
           done
-        env:
-          PGP_PASSWORD: ${{ secrets.PGP_PASSWORD }}
 
       - name: Upload APK, AAB, and ASC as workflow artifacts
         uses: actions/upload-artifact@v4

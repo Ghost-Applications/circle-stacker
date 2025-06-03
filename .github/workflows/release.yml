@@ -43,6 +43,14 @@ jobs:
       - name: Build signed APKs/AABs
         run: ./gradlew assembleRelease bundleRelease --no-daemon
 
+      - name: Upload APK and AAB as workflow artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-artifacts
+          path: |
+            app/build/outputs/apk/release/*.apk
+            app/build/outputs/bundle/release/*.aab
+
       - name: Import GPG key
         run: |
           echo "${{ secrets.PGP_KEY }}" | gpg --batch --import

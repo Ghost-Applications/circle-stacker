@@ -38,8 +38,38 @@ jobs:
       - name: Build with Gradle (using gradle/actions)
         uses: gradle/actions/setup-gradle@v3
 
-      - name: Build signed AAB
-        run: ./gradlew build bundle --no-daemon
+      - name: Build signed APKs and AABs (debug and release)
+        run: ./gradlew assembleDebug assembleRelease bundleDebug bundleRelease --no-daemon
+
+      - name: Import GPG key
+        run: |
+          echo "${{ secrets.PGP_KEY }}" | gpg --batch --import
+        env:
+          PGP_KEY: ${{ secrets.PGP_KEY }}
+
+      - name: Sign APKs and AABs with GPG
+        run: |
+          for file in app/build/outputs/apk/debug/*.apk app/build/outputs/apk/release/*.apk app/build/outputs/bundle/debug/*.aab app/build/outputs/bundle/release/*.aab; do
+            if [ -f "$file" ]; then
+              gpg --batch --yes --pinentry-mode loopback --passphrase "${{ secrets.PGP_PASSWORD }}" --armor --detach-sign "$file"
+            fi
+          done
+        env:
+          PGP_PASSWORD: ${{ secrets.PGP_PASSWORD }}
+
+      - name: Upload APK, AAB, and ASC as workflow artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-artifacts
+          path: |
+            app/build/outputs/apk/debug/*.apk
+            app/build/outputs/apk/debug/*.apk.asc
+            app/build/outputs/apk/release/*.apk
+            app/build/outputs/apk/release/*.apk.asc
+            app/build/outputs/bundle/debug/*.aab
+            app/build/outputs/bundle/debug/*.aab.asc
+            app/build/outputs/bundle/release/*.aab
+            app/build/outputs/bundle/release/*.aab.asc
 
       - name: Upload to Google Play (Internal Test Track)
         uses: r0adkll/upload-google-play@v1
@@ -48,4 +78,4 @@ jobs:
           packageName: rocks.ghostreader.circlestacker
           releaseFiles: app/build/outputs/bundle/release/*.aab
           track: internal
-          status: draft
+          status: completed

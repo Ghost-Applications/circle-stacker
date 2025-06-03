@@ -67,6 +67,7 @@ jobs:
         with:
           files: |
             app/build/outputs/apk/release/*.apk
+            app/build/outputs/apk/release/*.apk.asc
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

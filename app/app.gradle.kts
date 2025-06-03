@@ -19,7 +19,7 @@ android {
         minSdk = 21
         targetSdk = 35
         versionCode = buildNumber.toInt()
-        versionName = "Alumni Blues"
+        versionName = "BathtubGin"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

@@ -1,6 +1,6 @@
 = Circle Stacker
 
-A simple android game written in compose.
+A simple multi platform game written in compose.
 
 == Apk Signatures For Verifying Downloads From Github Releases
 

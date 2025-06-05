@@ -1,0 +1,30 @@
+name: Linux
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 18
+        uses: actions/setup-java@v4
+        with:
+          java-version: '18'
+          distribution: 'zulu'
+          cache: 'gradle'
+
+      - name: Run Gradle packageReleaseDistributionForCurrentOS
+        run: ./gradlew packageReleaseDistributionForCurrentOS --no-daemon
+
+      - name: Upload ComposeApp Distribution Binaries
+        uses: actions/upload-artifact@v4
+        with:
+          name: composeapp-distribution
+          path: composeApp/build/compose/binaries/main/app/**

@@ -1,0 +1,30 @@
+name: iOS Build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest
+
+      - name: Build iOS App
+        run: |
+          cd iosApp
+          xcodebuild -scheme iosApp -workspace iosApp.xcodeproj/project.xcworkspace -configuration Release -derivedDataPath build
+
+      - name: Upload iOS Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-build-artifacts
+          path: iosApp/build/Build/Products/Release-iphoneos/

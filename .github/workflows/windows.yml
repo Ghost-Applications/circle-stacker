@@ -27,4 +27,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: composeapp-distribution
-          path: composeApp/build/compose/binaries/main/app/**
+          path: composeApp/build/compose/binaries/main-release/app/**

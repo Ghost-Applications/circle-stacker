@@ -154,7 +154,6 @@ compose.desktop {
     application {
         mainClass = "cash.andrew.circlestacker.MainKt"
 
-        val buildNumber: String by project
         nativeDistributions {
             targetFormats(
                 TargetFormat.Exe

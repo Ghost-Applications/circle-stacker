@@ -27,8 +27,8 @@ jobs:
       - name: Upload ComposeApp Distribution Binaries
         uses: actions/upload-artifact@v4
         with:
-          name: composeapp-distribution
-          path: composeApp/build/compose/binaries/main-release/**/cash.andrew.circlestacker-*
+          name: Circle Stacker Apple Silicon
+          path: composeApp/build/compose/binaries/main-release/**/cash.andrew.circlestacker*
 
   package-x86:
     name: macOS Package (x86_64)
@@ -49,5 +49,5 @@ jobs:
       - name: Upload ComposeApp Distribution Binaries (x86_64)
         uses: actions/upload-artifact@v4
         with:
-          name: composeapp-distribution-x86_64
-          path: composeApp/build/compose/binaries/main-release/**/cash.andrew.circlestacker-*
+          name: Circle Stacker x86_64
+          path: composeApp/build/compose/binaries/main-release/**/cash.andrew.circlestacker*

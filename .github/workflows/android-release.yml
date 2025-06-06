@@ -11,6 +11,7 @@ permissions:
 
 jobs:
   build:
+    name: Android Release Build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -48,8 +49,8 @@ jobs:
         with:
           name: android-artifacts
           path: |
-            app/build/outputs/apk/release/*.apk
-            app/build/outputs/bundle/release/*.aab
+            composeApp/build/outputs/apk/release/*.apk
+            composeApp/build/outputs/bundle/release/*.aab
 
       - name: Import GPG key
         run: |
@@ -58,7 +59,7 @@ jobs:
 
       - name: Sign APKs with GPG
         run: |
-          for file in app/build/outputs/apk/release/*.apk; do
+          for file in composeApp/build/outputs/apk/release/*.apk; do
             gpg --batch --yes --pinentry-mode loopback --passphrase "${{ secrets.PGP_PASSWORD }}" --armor --detach-sign "$file"
           done
 
@@ -66,8 +67,8 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            app/build/outputs/apk/release/*.apk
-            app/build/outputs/apk/release/*.apk.asc
+            composeApp/build/outputs/apk/release/*.apk
+            composeApp/build/outputs/apk/release/*.apk.asc
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -76,6 +77,6 @@ jobs:
         with:
           serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
           packageName: rocks.ghostreader.circlestacker
-          releaseFiles: app/build/outputs/bundle/release/*.aab
+          releaseFiles: composeApp/build/outputs/bundle/release/*.aab
           track: production
           status: completed

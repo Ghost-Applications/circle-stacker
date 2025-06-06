@@ -9,6 +9,7 @@ on:
 
 jobs:
   package:
+    name: macOS Package (Apple Silicon)
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
@@ -27,4 +28,26 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: composeapp-distribution
-          path: composeApp/build/compose/binaries/main-release/**
+          path: composeApp/build/compose/binaries/main-release/app/**
+
+  package-x86:
+    name: macOS Package (x86_64)
+    runs-on: macos-13
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 18
+        uses: actions/setup-java@v4
+        with:
+          java-version: '18'
+          distribution: 'zulu'
+          cache: 'gradle'
+
+      - name: Run Gradle packageReleaseDistributionForCurrentOS (x86_64)
+        run: ./gradlew packageReleaseDistributionForCurrentOS --no-daemon
+
+      - name: Upload ComposeApp Distribution Binaries (x86_64)
+        uses: actions/upload-artifact@v4
+        with:
+          name: composeapp-distribution-x86_64
+          path: composeApp/build/compose/binaries/main-release/**/cash.andrew.circlestacker-*

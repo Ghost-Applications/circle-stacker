@@ -9,6 +9,7 @@ on:
 
 jobs:
   build:
+    name: iOS Simulator Build
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4

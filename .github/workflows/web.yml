@@ -5,6 +5,7 @@ on:
 
 jobs:
   build:
+    name: Web WASM Build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -19,13 +20,8 @@ jobs:
       - name: Build WASM JS Browser Distribution
         run: ./gradlew wasmJsBrowserDistribution --no-daemon
 
-      - name: Zip WASM Distribution
-        run: |
-          cd composeApp/build/dist/wasmJs/productionExecutable
-          zip -r ../../../web.zip .
-
       - name: Upload Web WASM Artifact
         uses: actions/upload-artifact@v4
         with:
           name: web.zip
-          path: composeApp/build/dist/web.zip
+          path: composeApp/build/dist/wasmJs/productionExecutable

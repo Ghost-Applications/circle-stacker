@@ -9,6 +9,7 @@ on:
 
 jobs:
   package:
+    name: Windows Package
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -27,4 +28,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: composeapp-distribution
-          path: composeApp/build/compose/binaries/main-release/**
+          path: composeApp/build/compose/binaries/main-release/**/cash.andrew.circlestacker-*

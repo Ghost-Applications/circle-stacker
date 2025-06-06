@@ -156,7 +156,15 @@ compose.desktop {
 
         nativeDistributions {
             targetFormats(
-                TargetFormat.Exe
+                // windows
+                TargetFormat.Exe,
+                TargetFormat.Msi,
+                // macOs
+                TargetFormat.Dmg,
+                TargetFormat.Pkg,
+                // linux
+                TargetFormat.Deb,
+                TargetFormat.Rpm
             )
             packageName = "cash.andrew.circlestacker"
             packageVersion = "1.0.0"

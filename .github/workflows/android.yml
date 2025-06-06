@@ -9,6 +9,7 @@ on:
 
 jobs:
   build:
+    name: Android Build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -48,7 +49,7 @@ jobs:
 
       - name: Sign APKs and AABs with GPG
         run: |
-          for file in app/build/outputs/apk/debug/*.apk app/build/outputs/apk/release/*.apk app/build/outputs/bundle/debug/*.aab app/build/outputs/bundle/release/*.aab; do
+          for file in composeApp/build/outputs/apk/debug/*.apk composeApp/build/outputs/apk/release/*.apk composeApp/build/outputs/bundle/debug/*.aab composeApp/build/outputs/bundle/release/*.aab; do
             if [ -f "$file" ]; then
               gpg --batch --yes --pinentry-mode loopback --passphrase "${{ secrets.PGP_PASSWORD }}" --armor --detach-sign "$file"
             fi
@@ -59,20 +60,20 @@ jobs:
         with:
           name: android-artifacts
           path: |
-            app/build/outputs/apk/debug/*.apk
-            app/build/outputs/apk/debug/*.apk.asc
-            app/build/outputs/apk/release/*.apk
-            app/build/outputs/apk/release/*.apk.asc
-            app/build/outputs/bundle/debug/*.aab
-            app/build/outputs/bundle/debug/*.aab.asc
-            app/build/outputs/bundle/release/*.aab
-            app/build/outputs/bundle/release/*.aab.asc
+            composeApp/build/outputs/apk/debug/*.apk
+            composeApp/build/outputs/apk/debug/*.apk.asc
+            composeApp/build/outputs/apk/release/*.apk
+            composeApp/build/outputs/apk/release/*.apk.asc
+            composeApp/build/outputs/bundle/debug/*.aab
+            composeApp/build/outputs/bundle/debug/*.aab.asc
+            composeApp/build/outputs/bundle/release/*.aab
+            composeApp/build/outputs/bundle/release/*.aab.asc
 
       - name: Upload to Google Play (Internal Test Track)
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
           packageName: rocks.ghostreader.circlestacker
-          releaseFiles: app/build/outputs/bundle/release/*.aab
+          releaseFiles: composeApp/build/outputs/bundle/release/*.aab
           track: internal
           status: completed

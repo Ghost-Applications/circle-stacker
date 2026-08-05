@@ -20,11 +20,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 @Preview
@@ -69,7 +69,7 @@ fun Game(viewModel: MainViewModel) {
     val radius = remember { Animatable(0f) }
     val coroutineScope = rememberCoroutineScope()
 
-    LaunchedEffect(gameState) {
+    LaunchedEffect(Unit) {
         highScore = loadHighScore()
     }
 
@@ -102,7 +102,7 @@ fun Game(viewModel: MainViewModel) {
         )
 
         is GameState.Playing -> {
-            GameRunning(gameState = state, radius = radius.value, highScore = highScore) {
+            GameRunning(gameState = state, radius = radius, highScore = highScore) {
                 coroutineScope.launch {
                     restartRadiusAnimation(
                         minDimension = minDimension,
@@ -163,7 +163,7 @@ fun BeginGame(
 fun GameRunning(
     highScore: Int,
     gameState: GameState.Playing,
-    radius: Float,
+    radius: Animatable<Float, AnimationVector1D>,
     circleClickUpdate: () -> Unit,
 ) {
     Points(gameState.points, highScore)
@@ -259,9 +259,10 @@ fun OldCircles(listOfCircles: List<GameState.CircleData>) {
 @Composable
 fun NewCircle(
     color: Color,
-    radius: Float,
+    radius: Animatable<Float, AnimationVector1D>,
     onClick: () -> Unit,
 ) {
+    val radiusValue = radius.value
     Canvas(
         modifier = Modifier
             .fillMaxSize()
@@ -272,7 +273,7 @@ fun NewCircle(
     ) {
         drawCircle(
             color = color,
-            radius = radius
+            radius = radiusValue
         )
     }
 }

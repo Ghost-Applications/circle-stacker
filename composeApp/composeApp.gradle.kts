@@ -1,44 +1,48 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
-import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
-    id("org.jetbrains.kotlin.multiplatform")
-    id("com.android.application")
-    alias(libs.plugins.composeMultiplatform)
-    alias(libs.plugins.composeCompiler)
-    alias(libs.plugins.composeHotReload)
+    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.kotlin.multiplatform.android.library)
 
-    id("build-number")
-    id("signing-config")
+    alias(libs.plugins.compose.multiplatform)
+    alias(libs.plugins.compose.compiler)
 }
 
 kotlin {
-    androidTarget {
-        @OptIn(ExperimentalKotlinGradlePluginApi::class)
+    jvmToolchain(21)
+
+    android {
+        namespace = "cash.andrew.circlestacker.compose"
+
+        compileSdk = libs.versions.android.sdk.get().toInt()
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_11)
+            jvmTarget.set(JvmTarget.JVM_21)
         }
+        androidResources {
+            enable = true
+        }
+
+        compileSdk = libs.versions.android.sdk.get().toInt()
+        minSdk = libs.versions.android.min.sdk.get().toInt()
     }
     
     listOf(
-        iosX64(),
         iosArm64(),
         iosSimulatorArm64()
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
-            baseName = "ComposeApp"
+            baseName = "CircleStacker"
             isStatic = true
+            binaryOption("bundleId", "cash.andrew.circlestacker")
         }
     }
     
     jvm("desktop")
-    
-    @OptIn(ExperimentalWasmDsl::class)
+
     wasmJs {
-        outputModuleName = "composeApp"
+        outputModuleName = "CircleStacker"
         browser {
             val rootDirPath = project.rootDir.path
             val projectDirPath = project.projectDir.path
@@ -57,19 +61,17 @@ kotlin {
     }
     
     sourceSets {
-        val desktopMain by getting
-        
         androidMain.dependencies {
-            implementation(compose.preview)
+            implementation(libs.androidx.compose.ui.tooling.preview)
             implementation(libs.androidx.activity.compose)
         }
         commonMain.dependencies {
-            implementation(compose.runtime)
-            implementation(compose.foundation)
-            implementation(compose.material3)
-            implementation(compose.ui)
-            implementation(compose.components.resources)
-            implementation(compose.components.uiToolingPreview)
+            implementation(libs.compose.runtime)
+            implementation(libs.compose.foundation)
+            implementation(libs.compose.material3)
+            implementation(libs.compose.ui)
+            implementation(libs.compose.components.resources)
+            implementation(libs.compose.ui.tooling.preview)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.viewmodel.compose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
@@ -77,77 +79,11 @@ kotlin {
             implementation(libs.napier)
             implementation(libs.okio)
         }
-        desktopMain.dependencies {
+        getByName("desktopMain").dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
         }
     }
-}
-
-android {
-    namespace = "cash.andrew.circlestacker"
-    compileSdk = 35
-
-
-    val buildNumber: String by project
-    defaultConfig {
-        applicationId = "rocks.ghostreader.circlestacker"
-        minSdk = 21
-        targetSdk = 35
-        versionCode = buildNumber.toInt()
-        versionName = "BathtubGin"
-    }
-
-    signingConfigs {
-        getByName("debug") {
-            storeFile = file("debug.keystore")
-            storePassword = "android"
-            keyAlias = "androiddebugkey"
-            keyPassword = "android"
-        }
-        create("release") {
-            val keystoreLocation: String by project
-            val keystorePassword: String by project
-            val storeKeyAlias: String by project
-            val aliasKeyPassword: String by project
-
-            storeFile = file(keystoreLocation)
-            storePassword = keystorePassword
-            keyAlias = storeKeyAlias
-            keyPassword = aliasKeyPassword
-        }
-    }
-
-    buildTypes {
-        debug {
-            applicationIdSuffix = ".debug"
-            signingConfig = signingConfigs.getByName("debug")
-        }
-        release {
-            signingConfig = signingConfigs.getByName("release")
-            isMinifyEnabled = true
-            isShrinkResources = true
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
-        }
-    }
-
-    packaging {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-}
-
-dependencies {
-    debugImplementation(compose.uiTooling)
 }
 
 compose.desktop {

@@ -20,7 +20,7 @@ android {
         minSdk = libs.versions.android.min.sdk.get().toInt()
         targetSdk = libs.versions.android.sdk.get().toInt()
         versionCode = buildNumber.toInt()
-        versionName = "BathtubGin"
+        versionName = "Carini"
     }
 
     signingConfigs {

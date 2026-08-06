@@ -38,7 +38,7 @@ jobs:
 
       - name: Compute build number
         run: |
-          echo "BUILD_NUMBER=$(git rev-list --count HEAD)" >> $GITHUB_ENV
+          echo "BUILD_NUMBER=$(( $(git rev-list --count HEAD) * 1000 + ${{ github.run_number }} ))" >> $GITHUB_ENV
 
       - name: Set build number in gradle.properties
         run: |
